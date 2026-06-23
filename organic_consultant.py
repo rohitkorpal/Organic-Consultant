@@ -472,6 +472,10 @@ menu = st.sidebar.selectbox(
 # Initialize Session State
 if "voice_text" not in st.session_state:
     st.session_state.voice_text = ""
+if "voice_key" not in st.session_state:
+    st.session_state.voice_key = 0
+if "academy_key" not in st.session_state:
+    st.session_state.academy_key = 0
 
 # Check for URL Query Parameters (Voice STT redirect)
 params = st.query_params
@@ -583,7 +587,7 @@ if menu in ["🎙️ Voice Assistant", "🎙️ वॉइस असिस्ट�
     # Render native audio input widget
     audio_file = st.audio_input(
         label="Record your voice / अपनी आवाज़ रिकॉर्ड करें" if not is_hindi else "अपनी आवाज़ रिकॉर्ड करें / Record your voice",
-        key="voice_recorder"
+        key=f"voice_recorder_{st.session_state.voice_key}"
     )
     
     if audio_file is not None:
@@ -634,14 +638,31 @@ if menu in ["🎙️ Voice Assistant", "🎙️ वॉइस असिस्ट�
             st.audio(fp, format="audio/mp3", autoplay=True)
         except Exception as e:
             st.warning(f"Voice generation failed: {str(e)}")
+            
+        # Add Reset button for Voice Assistant
+        st.markdown("<br>", unsafe_allow_html=True)
+        if st.button("🗑️ Reset Voice Assistant" if not is_hindi else "🗑️ रीसेट वॉइस असिस्टेंट", key="btn_reset_voice"):
+            st.session_state.voice_key += 1
+            st.rerun()
 
     # Divider and Ask the Organic Expert detailed text Q&A
     st.markdown("---")
     st.markdown(f"### 🔍 { 'Ask the Organic Expert' if not is_hindi else 'जैविक विशेषज्ञ से पूछें' }")
     st.write("Got a complex question about natural farming formulations, pest control, or crop layouts? Ask for a detailed, step-by-step organic guide!")
     
-    academy_query = st.text_input("Enter your question / अपना प्रश्न दर्ज करें", placeholder="e.g., How to prepare Agni Astra and when to spray it?", key="voice_academy_query_input")
-    if st.button("Ask Expert" if not is_hindi else "विशेषज्ञ से पूछें", key="voice_academy_query_btn"):
+    academy_query = st.text_input("Enter your question / अपना प्रश्न दर्ज करें", placeholder="e.g., How to prepare Agni Astra and when to spray it?", key=f"voice_academy_query_input_{st.session_state.academy_key}")
+    
+    cols_btn = st.columns([1, 1])
+    with cols_btn[0]:
+        ask_pressed = st.button("Ask Expert" if not is_hindi else "विशेषज्ञ से पूछें", key="voice_academy_query_btn")
+    with cols_btn[1]:
+        if st.button("🗑️ Reset Expert Search" if not is_hindi else "🗑️ रीसेट खोज", key="btn_reset_expert"):
+            st.session_state.academy_key += 1
+            if "voice_academy_response" in st.session_state:
+                del st.session_state.voice_academy_response
+            st.rerun()
+            
+    if ask_pressed:
         if academy_query:
             api_key = get_api_key()
             if api_key:
