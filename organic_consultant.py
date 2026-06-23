@@ -80,14 +80,17 @@ def call_gemini(prompt, system_instruction=None, mime_type=None, image_bytes=Non
     except Exception as e:
         return f"Request failed: {str(e)}"
 
-SYSTEM_INSTRUCTION = """You are a Voice-Based Multilevel Natural Farming Consultant.
-Your instructions:
-- Provide advice exclusively on natural and organic farming (Zero Budget Natural Farming / ZBNF).
-- Suggest organic remedies such as Jeevamrutha, Beejamrutha, Agni Astra, Neem oil, ginger-garlic-chilli paste, sour buttermilk, companion planting, and crop rotation.
-- NEVER suggest chemical fertilizers (e.g. Urea, DAP), chemical pesticides, or GMO seeds. If asked about chemicals, refuse politely and suggest an organic alternative.
-- Educate the farmer on the 7-Layer Multilevel Canopy Cropping system if relevant.
-- Keep responses short, concise, and direct (maximum 3-4 sentences) so they are suitable for speech synthesis (Text-to-Speech).
-- Respond in the language of the query (English or Hindi/Hinglish)."""
+# --- COMMENTED OUT STATIC SYSTEM_INSTRUCTION FOR REVIEW ---
+# SYSTEM_INSTRUCTION = """You are a Voice-Based Multilevel Natural Farming Consultant.
+# Your instructions:
+# - Provide advice exclusively on natural and organic farming (Zero Budget Natural Farming / ZBNF).
+# - Suggest organic remedies such as Jeevamrutha, Beejamrutha, Agni Astra, Neem oil, ginger-garlic-chilli paste, sour buttermilk, companion planting, and crop rotation.
+# - NEVER suggest chemical fertilizers (e.g. Urea, DAP), chemical pesticides, or GMO seeds. If asked about chemicals, refuse politely and suggest an organic alternative.
+# - Educate the farmer on the 7-Layer Multilevel Canopy Cropping system if relevant.
+# - Keep responses short, concise, and direct (maximum 3-4 sentences) so they are suitable for speech synthesis (Text-to-Speech).
+# - Respond in the language of the query (English or Hindi/Hinglish)."""
+# -------------------------------------------------------------
+SYSTEM_INSTRUCTION = ""
 
 # Load databases
 seed_data = {
@@ -470,6 +473,16 @@ st.sidebar.markdown("<div style='text-align:center; color:#b7e4c7; font-size:0.8
 lang = st.sidebar.selectbox("🔤 Language / भाषा", ["English", "Hindi / हिंदी"])
 is_hindi = lang == "Hindi / हिंदी"
 
+target_lang = "Hindi (हिंदी)" if is_hindi else "English"
+SYSTEM_INSTRUCTION = f"""You are a Voice-Based Multilevel Natural Farming Consultant.
+Your instructions:
+- Provide advice exclusively on natural and organic farming (Zero Budget Natural Farming / ZBNF).
+- Suggest organic remedies such as Jeevamrutha, Beejamrutha, Agni Astra, Neem oil, ginger-garlic-chilli paste, sour buttermilk, companion planting, and crop rotation.
+- NEVER suggest chemical fertilizers (e.g. Urea, DAP), chemical pesticides, or GMO seeds. If asked about chemicals, refuse politely and suggest an organic alternative.
+- Educate the farmer on the 7-Layer Multilevel Canopy Cropping system if relevant.
+- Keep responses short, concise, and direct (maximum 3-4 sentences) so they are suitable for speech synthesis (Text-to-Speech).
+- Respond exclusively in {target_lang}."""
+
 menu = st.sidebar.selectbox(
     "Select Module" if not is_hindi else "मॉड्यूल चुनें",
     [
@@ -605,12 +618,24 @@ if menu in ["🎙️ Voice Assistant", "🎙️ वॉइस असिस्ट�
     if audio_file is not None:
         query_bytes = audio_file.read()
         query_mime = "audio/wav"
+        # --- COMMENTED OUT STATIC VOICE PROMPT FOR REVIEW ---
+        # query_prompt = (
+        #     "Analyze this audio recording. First, transcribe exactly what the user is saying. "
+        #     "Then, provide a helpful response. Since this is for a Voice Assistant, please: "
+        #     "1. Give advice exclusively on natural and organic farming (ZBNF friendly). Suggest remedies like Jeevamrutha, Beejamrutha, etc. Never suggest chemical inputs. "
+        #     "2. Keep the advice response extremely short, concise, and direct (maximum 3-4 sentences) so it's suitable for text-to-speech. "
+        #     "3. Respond in the language of the audio (English or Hindi/Hinglish). "
+        #     "4. Format the final output exactly as:\n"
+        #     "Transcribed Query: <transcription of user speech>\n"
+        #     "Organic Advice: <your response>"
+        # )
+        # -------------------------------------------------------------
         query_prompt = (
             "Analyze this audio recording. First, transcribe exactly what the user is saying. "
             "Then, provide a helpful response. Since this is for a Voice Assistant, please: "
             "1. Give advice exclusively on natural and organic farming (ZBNF friendly). Suggest remedies like Jeevamrutha, Beejamrutha, etc. Never suggest chemical inputs. "
             "2. Keep the advice response extremely short, concise, and direct (maximum 3-4 sentences) so it's suitable for text-to-speech. "
-            "3. Respond in the language of the audio (English or Hindi/Hinglish). "
+            f"3. Respond exclusively in {target_lang}. "
             "4. Format the final output exactly as:\n"
             "Transcribed Query: <transcription of user speech>\n"
             "Organic Advice: <your response>"
@@ -679,8 +704,13 @@ if menu in ["🎙️ Voice Assistant", "🎙️ वॉइस असिस्ट�
             api_key = get_api_key()
             if api_key:
                 with st.spinner("Expert is drafting a detailed guide... / विशेषज्ञ उत्तर तैयार कर रहे हैं..."):
-                    system_instruction = """You are an expert advisor in Zero Budget Natural Farming (ZBNF) and organic farming.
-Provide deep, highly actionable, step-by-step instructions. Focus purely on natural and organic methods, including companion planting, multi-canopy layers, and traditional Indian formulations. Do not recommend any chemicals."""
+                    # --- COMMENTED OUT STATIC SYSTEM INSTRUCTION FOR REVIEW ---
+                    # system_instruction = """You are an expert advisor in Zero Budget Natural Farming (ZBNF) and organic farming.
+                    # Provide deep, highly actionable, step-by-step instructions. Focus purely on natural and organic methods, including companion planting, multi-canopy layers, and traditional Indian formulations. Do not recommend any chemicals."""
+                    # -------------------------------------------------------------
+                    system_instruction = f"""You are an expert advisor in Zero Budget Natural Farming (ZBNF) and organic farming.
+Provide deep, highly actionable, step-by-step instructions. Focus purely on natural and organic methods, including companion planting, multi-canopy layers, and traditional Indian formulations. Do not recommend any chemicals.
+Respond exclusively in {target_lang}. All headings and explanations must be in {target_lang}."""
                     response = call_gemini(academy_query, system_instruction=system_instruction)
                     st.session_state.voice_academy_response = response
             else:
@@ -802,6 +832,25 @@ elif menu in ["🌾 Crop & Seed Guidance", "🌾 फसल और बीज म�
         st.markdown("<br>", unsafe_allow_html=True)
         if st.button(f"🌱 Generate Custom Organic Cultivation Plan for {top_crop.capitalize()}" if not is_hindi else f"🌱 {top_crop.capitalize()} के लिए कस्टम जैविक रोपण योजना बनाएं", key="btn_crop_plan"):
             with st.spinner("Generating custom organic planting plan... / रोपण योजना तैयार कर रहे हैं..."):
+                # --- COMMENTED OUT STATIC CROP PLAN PROMPT FOR REVIEW ---
+                # prompt = (
+                #     f"Create a highly detailed, step-by-step custom organic cultivation plan for growing {top_crop.capitalize()} based on these soil and environmental parameters:\n"
+                #     f"- Nitrogen (N): {soil['n']} kg/ha\n"
+                #     f"- Phosphorus (P): {soil['p']} kg/ha\n"
+                #     f"- Potassium (K): {soil['k']} kg/ha\n"
+                #     f"- Average Temperature: {soil['temp']}°C\n"
+                #     f"- Relative Humidity: {soil['hum']}%\n"
+                #     f"- Soil pH: {soil['ph']}\n"
+                #     f"- Expected Rainfall: {soil['rain']} mm\n\n"
+                #     f"Please structure the cultivation plan with the following sections:\n"
+                #     f"1. Soil Preparation & Organic Amendments (Tailor recommendations to the N-P-K and pH levels. Suggest specific composts/green manures).\n"
+                #     f"2. Seed Treatment & Sowing (Recommend organic seed treatment methods like Beejamrutha, and outline spacing/depth).\n"
+                #     f"3. Irrigation & Water Management (Adjust based on temperature, humidity, and expected rainfall).\n"
+                #     f"4. Organic Nutrient & Pest Management (Propose specific formulas like Jeevamrutha or Neelastram/Agni Astra, outlining dosage and timeline).\n"
+                #     f"5. Companion Crops & Multilevel Suitability (Which cover crops or intercrops would benefit this system).\n\n"
+                #     f"Ensure all recommendations are strictly organic and natural farming oriented. Avoid any chemical inputs. Keep the language simple and clear."
+                # )
+                # -------------------------------------------------------------
                 prompt = (
                     f"Create a highly detailed, step-by-step custom organic cultivation plan for growing {top_crop.capitalize()} based on these soil and environmental parameters:\n"
                     f"- Nitrogen (N): {soil['n']} kg/ha\n"
@@ -817,7 +866,8 @@ elif menu in ["🌾 Crop & Seed Guidance", "🌾 फसल और बीज म�
                     f"3. Irrigation & Water Management (Adjust based on temperature, humidity, and expected rainfall).\n"
                     f"4. Organic Nutrient & Pest Management (Propose specific formulas like Jeevamrutha or Neelastram/Agni Astra, outlining dosage and timeline).\n"
                     f"5. Companion Crops & Multilevel Suitability (Which cover crops or intercrops would benefit this system).\n\n"
-                    f"Ensure all recommendations are strictly organic and natural farming oriented. Avoid any chemical inputs. Keep the language simple and clear."
+                    f"Ensure all recommendations are strictly organic and natural farming oriented. Avoid any chemical inputs. Keep the language simple and clear.\n"
+                    f"Respond exclusively in {target_lang}. All headings and explanations must be written in {target_lang}."
                 )
                 ai_response = call_gemini(prompt, system_instruction=SYSTEM_INSTRUCTION)
                 st.session_state.crop_plan = ai_response
@@ -887,7 +937,14 @@ elif menu in ["🐛 Organic Disease Control", "🐛 जैविक रोग �
                     st.error("Gemini API key not found. Please add your key to the `.env` file to enable image diagnosis.")
                 else:
                     with st.spinner("Analyzing image... / छवि का विश्लेषण कर रहे हैं..."):
-                        prompt = "Identify the crop and analyze this crop leaf for pests/diseases. Diagnose the problem and recommend ONLY organic/natural remedies (ZBNF friendly). Refuse to suggest chemical products. Format your response clearly with headings: 1. Crop & Disease Diagnosis, 2. Organic Treatment, 3. Preparation & Application, 4. Prevention Tips."
+                        # --- COMMENTED OUT STATIC DIAGNOSIS PROMPT FOR REVIEW ---
+                        # prompt = "Identify the crop and analyze this crop leaf for pests/diseases. Diagnose the problem and recommend ONLY organic/natural remedies (ZBNF friendly). Refuse to suggest chemical products. Format your response clearly with headings: 1. Crop & Disease Diagnosis, 2. Organic Treatment, 3. Preparation & Application, 4. Prevention Tips."
+                        # -------------------------------------------------------------
+                        prompt = (
+                            "Identify the crop and analyze this crop leaf for pests/diseases. Diagnose the problem and recommend ONLY organic/natural remedies (ZBNF friendly). Refuse to suggest chemical products. "
+                            "Format your response clearly with headings: 1. Crop & Disease Diagnosis, 2. Organic Treatment, 3. Preparation & Application, 4. Prevention Tips.\n"
+                            f"Respond exclusively in {target_lang}. All headings and explanations must be written in {target_lang}."
+                        )
                         ai_response = call_gemini(prompt, system_instruction=SYSTEM_INSTRUCTION, mime_type=mime_type, image_bytes=image_bytes)
                         
                         st.markdown(f"""<div class="glass-card" style="border-left: 5px solid #74c69d; margin-top:20px;">
@@ -960,6 +1017,18 @@ elif menu in ["🌦️ Weather & Market Intel", "🌦️ मौसम और म
         if st.button("📈 Analyze Mandi Trends & Strategy" if not is_hindi else "📈 मंडी रुझान और रणनीति विश्लेषण", key="btn_mandi_analysis"):
             with st.spinner("Analyzing market trends... / मंडी रुझान का विश्लेषण कर रहे हैं..."):
                 prices_str = "\n".join([f"- {crop}: Price {info['price']}, Daily Change {info['change']}, Trend Direction: {info['trend']}" for crop, info in market_prices.items()])
+                # --- COMMENTED OUT STATIC MANDI PROMPT FOR REVIEW ---
+                # prompt = (
+                #     f"Analyze the following market prices and trends for crops to provide strategic marketing and cultivation advice for farmers:\n\n"
+                #     f"{prices_str}\n\n"
+                #     f"Please structure your response with the following headings:\n"
+                #     f"1. Market Trend Summary (Highlight which crops are highly profitable now or rising fast).\n"
+                #     f"2. Holding vs Selling Advice (Should farmers sell immediately or store their produce for later price increases, especially for downward trending crops?).\n"
+                #     f"3. Value-Addition Strategies (How can farmers process these crops organically to double their income, e.g., turning mustard into organic oil, cotton into threads, wheat into premium flour?).\n"
+                #     f"4. Recommended Crop Shift (Suggestions on what crop to sow next based on the trends).\n\n"
+                #     f"Keep it highly practical, farmer-focused, ZBNF-aligned, and write in the style of an expert agricultural economist."
+                # )
+                # -------------------------------------------------------------
                 prompt = (
                     f"Analyze the following market prices and trends for crops to provide strategic marketing and cultivation advice for farmers:\n\n"
                     f"{prices_str}\n\n"
@@ -968,7 +1037,8 @@ elif menu in ["🌦️ Weather & Market Intel", "🌦️ मौसम और म
                     f"2. Holding vs Selling Advice (Should farmers sell immediately or store their produce for later price increases, especially for downward trending crops?).\n"
                     f"3. Value-Addition Strategies (How can farmers process these crops organically to double their income, e.g., turning mustard into organic oil, cotton into threads, wheat into premium flour?).\n"
                     f"4. Recommended Crop Shift (Suggestions on what crop to sow next based on the trends).\n\n"
-                    f"Keep it highly practical, farmer-focused, ZBNF-aligned, and write in the style of an expert agricultural economist."
+                    f"Keep it highly practical, farmer-focused, ZBNF-aligned, and write in the style of an expert agricultural economist.\n"
+                    f"Respond exclusively in {target_lang}. All headings and explanations must be written in {target_lang}."
                 )
                 ai_response = call_gemini(prompt, system_instruction=SYSTEM_INSTRUCTION)
                 st.session_state.mandi_analysis = ai_response
