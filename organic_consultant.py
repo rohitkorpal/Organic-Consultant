@@ -16,7 +16,7 @@ st.set_page_config(
 )
 
 # Helper functions for Gemini API
-# this function is only for streamlit don't change
+# this function is only for local deployment do not change
 def get_api_key():
     # Streamlit Cloud Secrets
     try:
@@ -94,16 +94,6 @@ def call_gemini(prompt, system_instruction=None, mime_type=None, image_bytes=Non
     except Exception as e:
         return f"Request failed: {str(e)}"
 
-# --- COMMENTED OUT STATIC SYSTEM_INSTRUCTION FOR REVIEW ---
-# SYSTEM_INSTRUCTION = """You are a Voice-Based Multilevel Natural Farming Consultant.
-# Your instructions:
-# - Provide advice exclusively on natural and organic farming (Zero Budget Natural Farming / ZBNF).
-# - Suggest organic remedies such as Jeevamrutha, Beejamrutha, Agni Astra, Neem oil, ginger-garlic-chilli paste, sour buttermilk, companion planting, and crop rotation.
-# - NEVER suggest chemical fertilizers (e.g. Urea, DAP), chemical pesticides, or GMO seeds. If asked about chemicals, refuse politely and suggest an organic alternative.
-# - Educate the farmer on the 7-Layer Multilevel Canopy Cropping system if relevant.
-# - Keep responses short, concise, and direct (maximum 3-4 sentences) so they are suitable for speech synthesis (Text-to-Speech).
-# - Respond in the language of the query (English or Hindi/Hinglish)."""
-# -------------------------------------------------------------
 SYSTEM_INSTRUCTION = ""
 
 # Load databases
@@ -483,33 +473,6 @@ st.markdown(f"""
 st.sidebar.markdown("<div class='sidebar-title'>🌾 AgroSolution</div>", unsafe_allow_html=True)
 st.sidebar.markdown("<div style='text-align:center; color:#b7e4c7; font-size:0.85rem; margin-top:-15px; margin-bottom:25px;'>Natural Farming Consultant</div>", unsafe_allow_html=True)
 
-# --- COMMENTED OUT STATIC LANGUAGE SELECTION & ROUTER FOR REVIEW ---
-# # Language Select
-# lang = st.sidebar.selectbox("🔤 Language / भाषा", ["English", "Hindi / हिंदी"])
-# is_hindi = lang == "Hindi / हिंदी"
-# 
-# target_lang = "Hindi (हिंदी)" if is_hindi else "English"
-# SYSTEM_INSTRUCTION = f"""You are a Voice-Based Multilevel Natural Farming Consultant.
-# Your instructions:
-# - Provide advice exclusively on natural and organic farming (Zero Budget Natural Farming / ZBNF).
-# - Suggest organic remedies such as Jeevamrutha, Beejamrutha, Agni Astra, Neem oil, ginger-garlic-chilli paste, sour buttermilk, companion planting, and crop rotation.
-# - NEVER suggest chemical fertilizers (e.g. Urea, DAP), chemical pesticides, or GMO seeds. If asked about chemicals, refuse politely and suggest an organic alternative.
-# - Educate the farmer on the 7-Layer Multilevel Canopy Cropping system if relevant.
-# - Keep responses short, concise, and direct (maximum 3-4 sentences) so they are suitable for speech synthesis (Text-to-Speech).
-# - Respond exclusively in {target_lang}."""
-# 
-# menu = st.sidebar.selectbox(
-#     "Select Module" if not is_hindi else "मॉड्यूल चुनें",
-#     [
-#         "🎙️ Voice Assistant" if not is_hindi else "🎙️ वॉइस असिस्टेंट",
-#         "🌾 Crop & Seed Guidance" if not is_hindi else "🌾 फसल और बीज मार्गदर्शन",
-#         "🐛 Organic Disease Control" if not is_hindi else "🐛 जैविक रोग नियंत्रण",
-#         "🌦️ Weather & Market Intel" if not is_hindi else "🌦️ मौसम और मंडी भाव",
-#         "📚 Natural Farming Academy" if not is_hindi else "📚 प्राकृतिक खेती अकादमी"
-#     ]
-# )
-# ----------------------------------------------------------------------
-
 # Regional Language configuration
 LANGUAGES = {
     "English": {"code": "en", "name": "English"},
@@ -613,6 +576,18 @@ Your instructions:
 - Keep responses short, concise, and direct (maximum 3-4 sentences) so they are suitable for speech synthesis (Text-to-Speech).
 - Respond exclusively in {target_lang}."""
 
+
+# Add seasonal module translations dynamically to avoid modifying the original MENU_TRANSLATIONS block
+MENU_TRANSLATIONS["English"]["seasonal"] = "📅 Seasonal Crop Calendar"
+MENU_TRANSLATIONS["Hindi / हिंदी"]["seasonal"] = "📅 मौसमी फसल कैलेंडर"
+MENU_TRANSLATIONS["Marathi / मराठी"]["seasonal"] = "📅 हंगामी पीक कॅलेंडर"
+MENU_TRANSLATIONS["Telugu / తెలుగు"]["seasonal"] = "📅 కాలానుగుణ పంట క్యాలెండర్"
+MENU_TRANSLATIONS["Tamil / தமிழ்"]["seasonal"] = "📅 பருவகால பயிர் காலண்டர்"
+MENU_TRANSLATIONS["Kannada / ಕನ್ನಡ"]["seasonal"] = "📅 ಕಾಲೋಚಿತ ಬೆಳೆ ಕ್ಯಾಲೆಂಡರ್"
+MENU_TRANSLATIONS["Bengali / বাংলা"]["seasonal"] = "📅 ঋতুভিত্তিক ফসল ক্যালেন্ডার"
+MENU_TRANSLATIONS["Punjabi / ਪੰਜਾਬੀ"]["seasonal"] = "📅 ਮੌਸਮੀ ਫਸਲ ਕੈਲੰਡਰ"
+MENU_TRANSLATIONS["Gujarati / ગુજરાતી"]["seasonal"] = "📅 મોસમી પાક કેલેન્ડર"
+
 menu_trans = MENU_TRANSLATIONS[lang]
 menu = st.sidebar.selectbox(
     menu_trans["title"],
@@ -621,7 +596,8 @@ menu = st.sidebar.selectbox(
         menu_trans["crop"],
         menu_trans["disease"],
         menu_trans["weather"],
-        menu_trans["academy"]
+        menu_trans["academy"],
+        menu_trans["seasonal"]
     ]
 )
 
@@ -639,6 +615,8 @@ for key, trans in menu_trans.items():
             menu_canonical = "Weather & Market Intel"
         elif key == "academy":
             menu_canonical = "Natural Farming Academy"
+        elif key == "seasonal":
+            menu_canonical = "Seasonal Crop Calendar"
         break
 
 # Initialize Session State
@@ -648,6 +626,10 @@ if "voice_key" not in st.session_state:
     st.session_state.voice_key = 0
 if "academy_key" not in st.session_state:
     st.session_state.academy_key = 0
+if "seasonal_key" not in st.session_state:
+    st.session_state.seasonal_key = 0
+if "seasonal_advice" not in st.session_state:
+    st.session_state.seasonal_advice = ""
 
 # Check for URL Query Parameters (Voice STT redirect)
 params = st.query_params
@@ -666,6 +648,10 @@ def predict_crop(n, p, k, temp, hum, ph, rain):
     
     try:
         model = joblib.load(model_path)
+    except Exception as e:
+        return None, f"Failed to load crop model. This is typically a version mismatch: the model was trained on scikit-learn 1.5.2, but the current environment has a different version. Please ensure scikit-learn==1.5.2 is installed. Error details: {str(e)}"
+        
+    try:
         input_data = np.array([n, p, k, temp, hum, ph, rain]).reshape(1, -1)
         
         # Mapping numerical crop index back to names
@@ -691,72 +677,15 @@ def predict_crop(n, p, k, temp, hum, ph, rain):
             
         return top_crops, None
     except Exception as e:
-        return None, str(e)
+        return None, f"Error predicting crop: {str(e)}"
 
 # Layout Router
 # ----------------------------------------------------
 # 1. Voice Assistant Module
-# ----------------------------------------------------
-# --- COMMENTED OUT STATIC ROUTING FOR REVIEW ---
-# if menu in ["🎙️ Voice Assistant", "🎙️ वॉइस असिस्टेंट"]:
 # -----------------------------------------------
 if menu_canonical == "Voice Assistant":
     st.markdown(f"<h2 style='color:#74c69d;'>🎙️ { 'Voice Assistant' if not is_hindi else 'वॉइस असिस्टेंट' }</h2>", unsafe_allow_html=True)
-    
-    # --- COMMENTED OUT OLD WEB SPEECH API JS BLOCK FOR REVIEW (Blocked by iframe sandbox policies) ---
-    # # Render native speech recognition script via Markdown (avoids iframe sandbox restrictions)
-    # st.markdown(textwrap.dedent(f"""
-    #     <div class="glass-card" style="text-align: center; max-width: 600px; margin: 0 auto 30px auto;">
-    #         <h4 style="margin-bottom: 20px;">{ 'Speak Now' if not is_hindi else 'अभी बोलें' }</h4>
-    #         <button id="mic-btn" class="pulse-btn" style="border: none; outline: none;">
-    #             <span style="font-size: 2.2rem;">🎙️</span>
-    #         </button>
-    #         <p id="status-txt" style="margin-top: 15px; font-weight: 600; color: #b7e4c7;">
-    #             { 'Click the mic to start listening' if not is_hindi else 'सुनना शुरू करने के लिए माइक दबाएं' }
-    #         </p>
-    #     </div>
-    #     
-    #     <script>
-    #     const btn = document.getElementById('mic-btn');
-    #     const status = document.getElementById('status-txt');
-    #     
-    #     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {{
-    #         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    #         const rec = new SpeechRecognition();
-    #         rec.continuous = false;
-    #         rec.interimResults = false;
-    #         rec.lang = "{ 'en-IN' if not is_hindi else 'hi-IN' }";
-    #         
-    #         btn.onclick = () => {{
-    #             try {{
-    #                 rec.start();
-    #                 status.innerHTML = "{ '🔴 Listening... Speak clearly.' if not is_hindi else '🔴 सुन रहा हूँ... स्पष्ट बोलें।' }";
-    #                 status.style.color = '#e76f51';
-    #             }} catch (e) {{
-    #                 console.log(e);
-    #             }}
-    #         }};
-    #         
-    #         rec.onresult = (event) => {{
-    #             const text = event.results[0][0].transcript;
-    #             status.innerHTML = "{ 'Transcribing...' if not is_hindi else 'अनुवाद किया जा रहा है...' }";
-    #             const url = new URL(window.location.href);
-    #             url.searchParams.set("voice_input", text);
-    #             window.location.href = url.toString();
-    #         }};
-    #         
-    #         rec.onerror = (e) => {{
-    #             status.innerHTML = "{ 'Speech error. Try clicking the mic again.' if not is_hindi else 'भाषण त्रुटि। फिर से माइक दबाएं।' }";
-    #             status.style.color = '#b7e4c7';
-    #         }};
-    #     }} else {{
-    #         btn.disabled = true;
-    #         status.innerHTML = "❌ Browser Speech Recognition not supported.";
-    #     }}
-    #     </script>
-    # """), unsafe_allow_html=True)
-    # --------------------------------------------------------------------------------------------------
-
+ 
     st.markdown(f"<p style='color:#b7e4c7;'>{ 'Record your query in English or Hindi below.' if not is_hindi else 'नीचे अंग्रेजी या हिंदी में अपना प्रश्न रिकॉर्ड करें।' }</p>", unsafe_allow_html=True)
     
     # Render native audio input widget
@@ -768,18 +697,7 @@ if menu_canonical == "Voice Assistant":
     if audio_file is not None:
         query_bytes = audio_file.read()
         query_mime = "audio/wav"
-        # --- COMMENTED OUT STATIC VOICE PROMPT FOR REVIEW ---
-        # query_prompt = (
-        #     "Analyze this audio recording. First, transcribe exactly what the user is saying. "
-        #     "Then, provide a helpful response. Since this is for a Voice Assistant, please: "
-        #     "1. Give advice exclusively on natural and organic farming (ZBNF friendly). Suggest remedies like Jeevamrutha, Beejamrutha, etc. Never suggest chemical inputs. "
-        #     "2. Keep the advice response extremely short, concise, and direct (maximum 3-4 sentences) so it's suitable for text-to-speech. "
-        #     "3. Respond in the language of the audio (English or Hindi/Hinglish). "
-        #     "4. Format the final output exactly as:\n"
-        #     "Transcribed Query: <transcription of user speech>\n"
-        #     "Organic Advice: <your response>"
-        # )
-        # -------------------------------------------------------------
+        
         query_prompt = (
             "Analyze this audio recording. First, transcribe exactly what the user is saying. "
             "Then, provide a helpful response. Since this is for a Voice Assistant, please: "
@@ -812,14 +730,13 @@ if menu_canonical == "Voice Assistant":
         # TTS playback
         try:
             speech_text = response
-            if "Organic Advice:" in response:
-                speech_text = response.split("Organic Advice:", 1)[1].strip()
+            lower_res = response.lower()
+            if "organic advice:" in lower_res:
+                idx = lower_res.index("organic advice:") + len("organic advice:")
+                speech_text = response[idx:].strip()
             from gtts import gTTS
             import io
-            # --- COMMENTED OUT STATIC TTS LANG FOR REVIEW ---
-            # has_hindi = any(ord(char) >= 0x0900 and ord(char) <= 0x097F for char in speech_text)
-            # tts_lang = 'hi' if (has_hindi or is_hindi) else 'en'
-            # -----------------------------------------------
+           
             tts = gTTS(text=speech_text, lang=tts_lang, slow=False)
             fp = io.BytesIO()
             tts.write_to_fp(fp)
@@ -858,10 +775,7 @@ if menu_canonical == "Voice Assistant":
             api_key = get_api_key()
             if api_key:
                 with st.spinner("Expert is drafting a detailed guide... / विशेषज्ञ उत्तर तैयार कर रहे हैं..."):
-                    # --- COMMENTED OUT STATIC SYSTEM INSTRUCTION FOR REVIEW ---
-                    # system_instruction = """You are an expert advisor in Zero Budget Natural Farming (ZBNF) and organic farming.
-                    # Provide deep, highly actionable, step-by-step instructions. Focus purely on natural and organic methods, including companion planting, multi-canopy layers, and traditional Indian formulations. Do not recommend any chemicals."""
-                    # -------------------------------------------------------------
+                   
                     system_instruction = f"""You are an expert advisor in Zero Budget Natural Farming (ZBNF) and organic farming.
 Provide deep, highly actionable, step-by-step instructions. Focus purely on natural and organic methods, including companion planting, multi-canopy layers, and traditional Indian formulations. Do not recommend any chemicals.
 Respond exclusively in {target_lang}. All headings and explanations must be in {target_lang}."""
@@ -919,17 +833,15 @@ Respond exclusively in {target_lang}. All headings and explanations must be in {
                         from gtts import gTTS
                         import io
                         speech_text = st.session_state.voice_academy_response
-                        # --- COMMENTED OUT STATIC TTS LANG FOR REVIEW ---
-                        # # Detect if there are Hindi characters to choose the right TTS language
-                        # has_hindi = any(ord(char) >= 0x0900 and ord(char) <= 0x097F for char in speech_text)
-                        # tts_lang = 'hi' if (has_hindi or is_hindi) else 'en'
-                        # -----------------------------------------------
-                        tts = gTTS(text=speech_text, lang=tts_lang, slow=False)
-                        fp = io.BytesIO()
-                        tts.write_to_fp(fp)
-                        fp.seek(0)
-                        st.session_state.voice_academy_audio = fp.read()
-                        st.rerun()
+                        if speech_text.strip():
+                            tts = gTTS(text=speech_text, lang=tts_lang, slow=False)
+                            fp = io.BytesIO()
+                            tts.write_to_fp(fp)
+                            fp.seek(0)
+                            st.session_state.voice_academy_audio = fp.read()
+                            st.rerun()
+                        else:
+                            st.warning("Expert response is empty. Cannot generate voice.")
                     except Exception as e:
                         st.warning(f"Voice generation failed: {str(e)}")
         
@@ -1014,25 +926,7 @@ elif menu_canonical == "Crop & Seed Guidance":
         st.markdown("<br>", unsafe_allow_html=True)
         if st.button(f"🌱 Generate Custom Organic Cultivation Plan for {top_crop.capitalize()}" if not is_hindi else f"🌱 {top_crop.capitalize()} के लिए कस्टम जैविक रोपण योजना बनाएं", key="btn_crop_plan"):
             with st.spinner("Generating custom organic planting plan... / रोपण योजना तैयार कर रहे हैं..."):
-                # --- COMMENTED OUT STATIC CROP PLAN PROMPT FOR REVIEW ---
-                # prompt = (
-                #     f"Create a highly detailed, step-by-step custom organic cultivation plan for growing {top_crop.capitalize()} based on these soil and environmental parameters:\n"
-                #     f"- Nitrogen (N): {soil['n']} kg/ha\n"
-                #     f"- Phosphorus (P): {soil['p']} kg/ha\n"
-                #     f"- Potassium (K): {soil['k']} kg/ha\n"
-                #     f"- Average Temperature: {soil['temp']}°C\n"
-                #     f"- Relative Humidity: {soil['hum']}%\n"
-                #     f"- Soil pH: {soil['ph']}\n"
-                #     f"- Expected Rainfall: {soil['rain']} mm\n\n"
-                #     f"Please structure the cultivation plan with the following sections:\n"
-                #     f"1. Soil Preparation & Organic Amendments (Tailor recommendations to the N-P-K and pH levels. Suggest specific composts/green manures).\n"
-                #     f"2. Seed Treatment & Sowing (Recommend organic seed treatment methods like Beejamrutha, and outline spacing/depth).\n"
-                #     f"3. Irrigation & Water Management (Adjust based on temperature, humidity, and expected rainfall).\n"
-                #     f"4. Organic Nutrient & Pest Management (Propose specific formulas like Jeevamrutha or Neelastram/Agni Astra, outlining dosage and timeline).\n"
-                #     f"5. Companion Crops & Multilevel Suitability (Which cover crops or intercrops would benefit this system).\n\n"
-                #     f"Ensure all recommendations are strictly organic and natural farming oriented. Avoid any chemical inputs. Keep the language simple and clear."
-                # )
-                # -------------------------------------------------------------
+                
                 prompt = (
                     f"Create a highly detailed, step-by-step custom organic cultivation plan for growing {top_crop.capitalize()} based on these soil and environmental parameters:\n"
                     f"- Nitrogen (N): {soil['n']} kg/ha\n"
@@ -1205,18 +1099,7 @@ elif menu_canonical == "Weather & Market Intel":
         if st.button("📈 Analyze Mandi Trends & Strategy" if not is_hindi else "📈 मंडी रुझान और रणनीति विश्लेषण", key="btn_mandi_analysis"):
             with st.spinner("Analyzing market trends... / मंडी रुझान का विश्लेषण कर रहे हैं..."):
                 prices_str = "\n".join([f"- {crop}: Price {info['price']}, Daily Change {info['change']}, Trend Direction: {info['trend']}" for crop, info in market_prices.items()])
-                # --- COMMENTED OUT STATIC MANDI PROMPT FOR REVIEW ---
-                # prompt = (
-                #     f"Analyze the following market prices and trends for crops to provide strategic marketing and cultivation advice for farmers:\n\n"
-                #     f"{prices_str}\n\n"
-                #     f"Please structure your response with the following headings:\n"
-                #     f"1. Market Trend Summary (Highlight which crops are highly profitable now or rising fast).\n"
-                #     f"2. Holding vs Selling Advice (Should farmers sell immediately or store their produce for later price increases, especially for downward trending crops?).\n"
-                #     f"3. Value-Addition Strategies (How can farmers process these crops organically to double their income, e.g., turning mustard into organic oil, cotton into threads, wheat into premium flour?).\n"
-                #     f"4. Recommended Crop Shift (Suggestions on what crop to sow next based on the trends).\n\n"
-                #     f"Keep it highly practical, farmer-focused, ZBNF-aligned, and write in the style of an expert agricultural economist."
-                # )
-                # -------------------------------------------------------------
+           
                 prompt = (
                     f"Analyze the following market prices and trends for crops to provide strategic marketing and cultivation advice for farmers:\n\n"
                     f"{prices_str}\n\n"
@@ -1317,3 +1200,180 @@ elif menu_canonical == "Natural Farming Academy":
                         <p style="font-size:0.95rem; line-height:1.4;">{desc}</p>
                     </div>
                 """, unsafe_allow_html=True)
+
+# ----------------------------------------------------
+# 6. Seasonal Crop Calendar Module
+# ----------------------------------------------------
+elif menu_canonical == "Seasonal Crop Calendar":
+    st.markdown(f"<h2 style='color:#74c69d;'>📅 { 'Seasonal Crop Calendar' if not is_hindi else 'मौसमी फसल कैलेंडर' }</h2>", unsafe_allow_html=True)
+    st.markdown(
+        f"<p>{ 'Understand the sowing periods of different crops and get organic cultivation advice.' if not is_hindi else 'विभिन्न फसलों की बुवाई अवधि को समझें और जैविक खेती के बारे में सलाह प्राप्त करें।' }</p>",
+        unsafe_allow_html=True
+    )
+    
+    # Categorization of crops under seasons
+    kharif_crops = ["Rice", "Maize", "Jute", "Cotton", "Pigeonpeas", "Blackgram", "Mothbeans"]
+    rabi_crops = ["Wheat", "Chickpea", "Lentil", "Kidneybeans"]
+    zaid_crops = ["Mungbean", "Watermelon", "Muskmelon"]
+    perennial_crops = ["Pomegranate", "Banana", "Mango", "Grapes", "Apple", "Orange", "Papaya", "Coconut", "Coffee"]
+    
+    # Define a helper function to render crop profile and AI advice inside each tab
+    # to prevent state collision between tabs.
+    def render_crop_guide(sel_crop, suffix):
+        if sel_crop:
+            crop_key = sel_crop.lower().replace(" ", "")
+            crop_info = seed_data.get(crop_key, {
+                "seeds": ["Local Desi varieties"],
+                "season": "Local cropping season",
+                "duration": "N/A",
+                "schemes": ["PM-KISAN"],
+                "organic_tip": "Apply general Jeevamrutha soil manure."
+            })
+            
+            st.markdown(f"""<div class="glass-card" style="border-left: 5px solid #74c69d; margin-top:20px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="margin:0; color:#e8f5e9;">{sel_crop} Profile</h3>
+                    <span class="tag">{crop_info['season']}</span>
+                </div>
+                <div style="margin-top: 15px; display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <div>
+                        <p><span class="accent-text">Organic Seed Varieties:</span> {", ".join(crop_info['seeds'])}</p>
+                        <p><span class="accent-text">Crop Duration:</span> {crop_info['duration']}</p>
+                    </div>
+                    <div>
+                        <p><span class="accent-text">Government Schemes:</span> {", ".join(crop_info['schemes'])}</p>
+                        <p style="background: rgba(116, 198, 157, 0.08); padding: 8px; border-radius: 8px; font-size: 0.9rem; border: 1px dashed rgba(116, 198, 157, 0.2);">
+                            <span class="accent-text">💡 Organic Tip:</span> {crop_info['organic_tip']}
+                        </p>
+                    </div>
+                </div>
+            </div>""", unsafe_allow_html=True)
+            
+            # AI Seasonal Companion Advisor
+            st.markdown("---")
+            st.markdown(f"### 🌱 { 'AI Sowing & Companion Crop Advisor' if not is_hindi else 'एआई बुवाई और सह-फसल सलाहकार' }")
+            st.write(
+                "Get customized, dynamic instructions from our AI on spacing, companion intercrops, and timing details for organic cultivation."
+                if not is_hindi else
+                "जैविक खेती के लिए अंतर, सह-फसल और बुवाई के समय पर हमारे एआई से व्यक्तिगत सलाह प्राप्त करें।"
+            )
+            
+            # Keep seasonal advice in session state per crop to avoid overwriting other crops
+            advice_key = f"seasonal_advice_{crop_key}"
+            if advice_key not in st.session_state:
+                st.session_state[advice_key] = ""
+                
+            col_btn1, col_btn2 = st.columns([1, 1])
+            with col_btn1:
+                ask_advisor = st.button("🌱 Get AI Sowing Advice" if not is_hindi else "🌱 एआई बुवाई सलाह प्राप्त करें", key=f"btn_ask_seasonal_ai_{suffix}")
+            with col_btn2:
+                if st.button("🗑️ Reset Advisor" if not is_hindi else "🗑️ रीसेट सलाहकार", key=f"btn_reset_seasonal_{suffix}"):
+                    st.session_state.seasonal_key += 1
+                    st.session_state[advice_key] = ""
+                    st.rerun()
+                    
+            if ask_advisor:
+                api_key = get_api_key()
+                if api_key:
+                    with st.spinner("AI is compiling dynamic sowing guidelines... / एआई सलाह तैयार कर रहा है..."):
+                        prompt = (
+                            f"Provide a short, extremely practical organic sowing and companion planting guide for growing {sel_crop} during the standard season.\n"
+                            f"Please structure your response with these exact headings:\n"
+                            f"1. Spacing & Sowing Depth (Optimal distance between seeds/rows).\n"
+                            f"2. Recommended Companion Intercrops (Which ZBNF-friendly crops should be sown alongside it to fix nitrogen or prevent pests naturally).\n"
+                            f"3. Irrigation Schedule (How to water at the early vegetative stages).\n"
+                            f"4. Early Stage Pest Prevention (Natural liquid spray like Neem urine formula or sour buttermilk dilution details).\n\n"
+                            f"Ensure all advice is strictly organic and ZBNF compliant. Write in extremely simple layman language that a simple rural farmer can easily follow. Avoid scientific, technical, or academic jargon.\n"
+                            f"Respond exclusively in {target_lang}. All headings and explanations must be in {target_lang}."
+                        )
+                        ai_response = call_gemini(prompt, system_instruction=SYSTEM_INSTRUCTION)
+                        st.session_state[advice_key] = ai_response
+                else:
+                    # Rule-based static fallback matching the selected crop
+                    if not is_hindi:
+                        st.session_state[advice_key] = f"General advice for {sel_crop}: Soil must be prepared using Jeevamrutha manure before sowing. Treat seeds with Beejamrutha. Spray diluted Neem oil (1-2%) if pests are observed."
+                    else:
+                        st.session_state[advice_key] = f"{sel_crop} के लिए सलाह: बुवाई से पहले मिट्टी में जीवामृत डालें। बीजों का बीजामृत से उपचार करें। कीट दिखने पर नीम के तेल (1-2%) का छिड़काव करें।"
+                        
+            if st.session_state[advice_key]:
+                st.markdown(f"""<div class="glass-card" style="border-left: 5px solid #74c69d; margin-top:20px;">
+                    <h4 style="color:#74c69d; margin-top:0;">{ 'AI Sowing Advice' if not is_hindi else 'एआई बुवाई सलाह' }</h4>
+                    <p style="font-size:1.05rem; line-height:1.6; color:#e8f5e9; white-space: pre-wrap;">{st.session_state[advice_key]}</p>
+                </div>""", unsafe_allow_html=True)
+
+    # Render original tabs layout
+    season_tabs = st.tabs([
+        "🌧️ Kharif (Monsoon)" if not is_hindi else "🌧️ खरीफ (मानसून)",
+        "❄️ Rabi (Winter)" if not is_hindi else "❄️ रबी (सर्दी)",
+        "☀️ Zaid (Summer)" if not is_hindi else "☀️ जायद (गर्मी)",
+        "🌳 Perennial / Fruits" if not is_hindi else "🌳 बारहमासी / फल"
+    ])
+    
+    # Render guide guide & selectbox inside each separate tab to prevent state collision
+    with season_tabs[0]:
+        st.markdown(f"""
+            <div class="glass-card" style="border-left: 5px solid #1b4332;">
+                <h4 style="color:#74c69d; margin-top:0;">{ '🌧️ Kharif Crop Sowing Guide' if not is_hindi else '🌧️ खरीफ फसल बुवाई मार्गदर्शिका' }</h4>
+                <p><strong>{ 'Sowing Period:' if not is_hindi else 'बुवाई अवधि:' }</strong> June - July (Onset of Monsoon)</p>
+                <p><strong>{ 'Harvesting Period:' if not is_hindi else 'कटाई अवधि:' }</strong> September - October</p>
+                <p><strong>{ 'Characteristics:' if not is_hindi else 'विशेषताएं:' }</strong> { 'Requires high water levels and warm weather conditions during growth.' if not is_hindi else 'विकास के दौरान अधिक पानी और गर्म मौसम की स्थिति की आवश्यकता होती है।' }</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        sel_crop_kharif = st.selectbox(
+            "Select Kharif Crop / फसल चुनें" if not is_hindi else "खरीफ फसल चुनें",
+            [c.capitalize() for c in kharif_crops],
+            key=f"sel_kharif_crop_{st.session_state.seasonal_key}"
+        )
+        render_crop_guide(sel_crop_kharif, "kharif")
+        
+    with season_tabs[1]:
+        st.markdown(f"""
+            <div class="glass-card" style="border-left: 5px solid #2d6a4f;">
+                <h4 style="color:#74c69d; margin-top:0;">{ '❄️ Rabi Crop Sowing Guide' if not is_hindi else '❄️ रबी फसल बुवाई मार्गदर्शिका' }</h4>
+                <p><strong>{ 'Sowing Period:' if not is_hindi else 'बुवाई अवधि:' }</strong> October - November (Winter Season)</p>
+                <p><strong>{ 'Harvesting Period:' if not is_hindi else 'कटाई अवधि:' }</strong> March - April</p>
+                <p><strong>{ 'Characteristics:' if not is_hindi else 'विशेषताएं:' }</strong> { 'Requires a cool climate during sowing and a dry, warm climate during harvesting.' if not is_hindi else 'बुवाई के समय ठंडी जलवायु और कटाई के समय शुष्क, गर्म जलवायु की आवश्यकता होती है।' }</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        sel_crop_rabi = st.selectbox(
+            "Select Rabi Crop / फसल चुनें" if not is_hindi else "रबी फसल चुनें",
+            [c.capitalize() for c in rabi_crops],
+            key=f"sel_rabi_crop_{st.session_state.seasonal_key}"
+        )
+        render_crop_guide(sel_crop_rabi, "rabi")
+        
+    with season_tabs[2]:
+        st.markdown(f"""
+            <div class="glass-card" style="border-left: 5px solid #40916c;">
+                <h4 style="color:#74c69d; margin-top:0;">{ '☀️ Zaid Crop Sowing Guide' if not is_hindi else '☀️ जायद फसल बुवाई मार्गदर्शिका' }</h4>
+                <p><strong>{ 'Sowing Period:' if not is_hindi else 'बुवाई अवधि:' }</strong> March - April (Summer Season)</p>
+                <p><strong>{ 'Harvesting Period:' if not is_hindi else 'कटाई अवधि:' }</strong> June (Before Monsoon)</p>
+                <p><strong>{ 'Characteristics:' if not is_hindi else 'विशेषताएं:' }</strong> { 'Grows in dry weather with long day length for flowering.' if not is_hindi else 'फूलों के खिलने के लिए लंबे समय तक धूप और शुष्क मौसम में बढ़ता है।' }</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        sel_crop_zaid = st.selectbox(
+            "Select Zaid Crop / फसल चुनें" if not is_hindi else "जायद फसल चुनें",
+            [c.capitalize() for c in zaid_crops],
+            key=f"sel_zaid_crop_{st.session_state.seasonal_key}"
+        )
+        render_crop_guide(sel_crop_zaid, "zaid")
+        
+    with season_tabs[3]:
+        st.markdown(f"""
+            <div class="glass-card" style="border-left: 5px solid #52b788;">
+                <h4 style="color:#74c69d; margin-top:0;">{ '🌳 Perennial Crop Guide' if not is_hindi else '🌳 बारहमासी फसल मार्गदर्शिका' }</h4>
+                <p><strong>{ 'Planting Period:' if not is_hindi else 'रोपण अवधि:' }</strong> Best planted during monsoon (July - August) or spring (Feb - March).</p>
+                <p><strong>{ 'Yield Duration:' if not is_hindi else 'उत्पादन अवधि:' }</strong> Perennial (Grows over multiple years, harvesting seasonally).</p>
+                <p><strong>{ 'Characteristics:' if not is_hindi else 'विशेषताएं:' }</strong> { 'Requires long term planning, proper spacing, and persistent mulching/Jeevamrutha application.' if not is_hindi else 'लंबे समय तक योजना, उचित दूरी और लगातार मल्चिंग/जीवामृत के प्रयोग की आवश्यकता होती है।' }</p>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        sel_crop_perennial = st.selectbox(
+            "Select Perennial Crop / फसल चुनें" if not is_hindi else "बारहमासी फसल चुनें",
+            [c.capitalize() for c in perennial_crops],
+            key=f"sel_perennial_crop_{st.session_state.seasonal_key}"
+        )
+        render_crop_guide(sel_crop_perennial, "perennial")
