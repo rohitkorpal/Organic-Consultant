@@ -523,148 +523,176 @@ def predict_crop(n, p, k, temp, hum, ph, rain):
 # ----------------------------------------------------
 if menu in ["🎙️ Voice Assistant", "🎙️ वॉइस असिस्टेंट"]:
     st.markdown(f"<h2 style='color:#74c69d;'>🎙️ { 'Voice Assistant' if not is_hindi else 'वॉइस असिस्टेंट' }</h2>", unsafe_allow_html=True)
-    st.markdown(f"<p style='color:#b7e4c7;'>{ 'Click the microphone button and ask your question in English or Hindi.' if not is_hindi else 'माइक बटन पर क्लिक करें और अंग्रेजी या हिंदी में अपना प्रश्न पूछें।' }</p>", unsafe_allow_html=True)
     
-    # Render native speech recognition script via Markdown (avoids iframe sandbox restrictions)
-    st.markdown(textwrap.dedent(f"""
-        <div class="glass-card" style="text-align: center; max-width: 600px; margin: 0 auto 30px auto;">
-            <h4 style="margin-bottom: 20px;">{ 'Speak Now' if not is_hindi else 'अभी बोलें' }</h4>
-            <button id="mic-btn" class="pulse-btn" style="border: none; outline: none;">
-                <span style="font-size: 2.2rem;">🎙️</span>
-            </button>
-            <p id="status-txt" style="margin-top: 15px; font-weight: 600; color: #b7e4c7;">
-                { 'Click the mic to start listening' if not is_hindi else 'सुनना शुरू करने के लिए माइक दबाएं' }
-            </p>
-        </div>
-        
-        <script>
-        const btn = document.getElementById('mic-btn');
-        const status = document.getElementById('status-txt');
-        
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {{
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const rec = new SpeechRecognition();
-            rec.continuous = false;
-            rec.interimResults = false;
-            rec.lang = "{ 'en-IN' if not is_hindi else 'hi-IN' }";
-            
-            btn.onclick = () => {{
-                try {{
-                    rec.start();
-                    status.innerHTML = "{ '🔴 Listening... Speak clearly.' if not is_hindi else '🔴 सुन रहा हूँ... स्पष्ट बोलें।' }";
-                    status.style.color = '#e76f51';
-                }} catch (e) {{
-                    console.log(e);
-                }}
-            }};
-            
-            rec.onresult = (event) => {{
-                const text = event.results[0][0].transcript;
-                status.innerHTML = "{ 'Transcribing...' if not is_hindi else 'अनुवाद किया जा रहा है...' }";
-                // Redirect parent window with query param
-                const url = new URL(window.location.href);
-                url.searchParams.set("voice_input", text);
-                window.location.href = url.toString();
-            }};
-            
-            rec.onerror = (e) => {{
-                status.innerHTML = "{ 'Speech error. Try clicking the mic again.' if not is_hindi else 'भाषण त्रुटि। फिर से माइक दबाएं।' }";
-                status.style.color = '#b7e4c7';
-            }};
-            
-            rec.onend = () => {{
-                // Handled in onresult redirect
-            }};
-        }} else {{
-            btn.disabled = true;
-            status.innerHTML = "❌ Browser Speech Recognition not supported.";
-        }}
-        </script>
-    """), unsafe_allow_html=True)
+    # --- COMMENTED OUT OLD WEB SPEECH API JS BLOCK FOR REVIEW (Blocked by iframe sandbox policies) ---
+    # # Render native speech recognition script via Markdown (avoids iframe sandbox restrictions)
+    # st.markdown(textwrap.dedent(f"""
+    #     <div class="glass-card" style="text-align: center; max-width: 600px; margin: 0 auto 30px auto;">
+    #         <h4 style="margin-bottom: 20px;">{ 'Speak Now' if not is_hindi else 'अभी बोलें' }</h4>
+    #         <button id="mic-btn" class="pulse-btn" style="border: none; outline: none;">
+    #             <span style="font-size: 2.2rem;">🎙️</span>
+    #         </button>
+    #         <p id="status-txt" style="margin-top: 15px; font-weight: 600; color: #b7e4c7;">
+    #             { 'Click the mic to start listening' if not is_hindi else 'सुनना शुरू करने के लिए माइक दबाएं' }
+    #         </p>
+    #     </div>
+    #     
+    #     <script>
+    #     const btn = document.getElementById('mic-btn');
+    #     const status = document.getElementById('status-txt');
+    #     
+    #     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {{
+    #         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    #         const rec = new SpeechRecognition();
+    #         rec.continuous = false;
+    #         rec.interimResults = false;
+    #         rec.lang = "{ 'en-IN' if not is_hindi else 'hi-IN' }";
+    #         
+    #         btn.onclick = () => {{
+    #             try {{
+    #                 rec.start();
+    #                 status.innerHTML = "{ '🔴 Listening... Speak clearly.' if not is_hindi else '🔴 सुन रहा हूँ... स्पष्ट बोलें।' }";
+    #                 status.style.color = '#e76f51';
+    #             }} catch (e) {{
+    #                 console.log(e);
+    #             }}
+    #         }};
+    #         
+    #         rec.onresult = (event) => {{
+    #             const text = event.results[0][0].transcript;
+    #             status.innerHTML = "{ 'Transcribing...' if not is_hindi else 'अनुवाद किया जा रहा है...' }";
+    #             const url = new URL(window.location.href);
+    #             url.searchParams.set("voice_input", text);
+    #             window.location.href = url.toString();
+    #         }};
+    #         
+    #         rec.onerror = (e) => {{
+    #             status.innerHTML = "{ 'Speech error. Try clicking the mic again.' if not is_hindi else 'भाषण त्रुटि। फिर से माइक दबाएं।' }";
+    #             status.style.color = '#b7e4c7';
+    #         }};
+    #     }} else {{
+    #         btn.disabled = true;
+    #         status.innerHTML = "❌ Browser Speech Recognition not supported.";
+    #     }}
+    #     </script>
+    # """), unsafe_allow_html=True)
+    # --------------------------------------------------------------------------------------------------
+
+    st.markdown(f"<p style='color:#b7e4c7;'>{ 'Record your query in English or Hindi below.' if not is_hindi else 'नीचे अंग्रेजी या हिंदी में अपना प्रश्न रिकॉर्ड करें।' }</p>", unsafe_allow_html=True)
     
-    # Process Voice Input
-    voice_query = st.session_state.voice_text
-    st.text_input("Your Query / आपका सवाल", value=voice_query, key="manual_query_box")
+    # Render native audio input widget
+    audio_file = st.audio_input(
+        label="Record your voice / अपनी आवाज़ रिकॉर्ड करें" if not is_hindi else "अपनी आवाज़ रिकॉर्ड करें / Record your voice",
+        key="voice_recorder"
+    )
     
-    response = ""
-    if voice_query:
-        query_lower = voice_query.lower()
-        st.markdown(f"**Recognized Query:** *\"{voice_query}\"*")
+    if audio_file is not None:
+        query_bytes = audio_file.read()
+        query_mime = "audio/wav"
+        query_prompt = (
+            "Analyze this audio recording. First, transcribe exactly what the user is saying. "
+            "Then, provide a helpful response. Since this is for a Voice Assistant, please: "
+            "1. Give advice exclusively on natural and organic farming (ZBNF friendly). Suggest remedies like Jeevamrutha, Beejamrutha, etc. Never suggest chemical inputs. "
+            "2. Keep the advice response extremely short, concise, and direct (maximum 3-4 sentences) so it's suitable for text-to-speech. "
+            "3. Respond in the language of the audio (English or Hindi/Hinglish). "
+            "4. Format the final output exactly as:\n"
+            "Transcribed Query: <transcription of user speech>\n"
+            "Organic Advice: <your response>"
+        )
         
-        # Check if Gemini API is available
+        response = ""
         api_key = get_api_key()
         if api_key:
-            with st.spinner("AI is thinking... / एआई सोच रहा है..."):
-                response = call_gemini(voice_query, system_instruction=SYSTEM_INSTRUCTION)
+            with st.spinner("AI is listening & thinking... / एआई सुन रहा है और सोच रहा है..."):
+                response = call_gemini(
+                    prompt=query_prompt, 
+                    system_instruction=SYSTEM_INSTRUCTION, 
+                    mime_type=query_mime, 
+                    image_bytes=query_bytes
+                )
         else:
-            # --- OLD RULE-BASED FALLBACK CODE ---
-            # if "jeevamrutha" in query_lower or "जीवामृत" in query_lower:
-            #     if not is_hindi:
-            #         response = "Jeevamrutha is an organic microbial culture. To prepare it: mix 10 kg cow dung, 10 liters cow urine, 2 kg jaggery, 2 kg pulse flour, and a handful of forest soil in 200 liters of water..."
-            #     else:
-            #         response = "जीवामृत एक जैविक खाद है। इसे बनाने के लिए: 10 किलो गाय का गोबर, 10..."
-            if "jeevamrutha" in query_lower or "जीवामृत" in query_lower:
-                if not is_hindi:
-                    response = "Jeevamrutha is an organic microbial culture. To prepare it: mix 10 kg cow dung, 10 liters cow urine, 2 kg jaggery, 2 kg pulse flour, and a handful of forest soil in 200 liters of water. Ferment for 7 days in shade, stirring twice daily. Apply to the soil near the root zone."
-                else:
-                    response = "जीवामृत एक जैविक खाद है। इसे बनाने के लिए: 10 किलो गाय का गोबर, 10 लीटर गोमूत्र, 2 किलो गुड़, 2 किलो बेसन और मुट्ठी भर जंगल की मिट्टी को 200 लीटर पानी में मिलाएं। छांव में 7 दिनों तक किण्वित होने दें। इसे मिट्टी में छिड़कें।"
+            response = "Transcribed Query: [Voice Input]\nOrganic Advice: Audio transcription requires Gemini API key. Please use the text search below for rule-based matching."
             
-            # B. Beejamrutha recipe
-            elif "beejamrutha" in query_lower or "बीजामृत" in query_lower:
-                if not is_hindi:
-                    response = "Beejamrutha is used for seed treatment. Preparation: mix 5 kg cow dung, 5 liters cow urine, 50 grams lime, and a handful of forest soil in 20 liters of water. Let it ferment for 24 hours. Coat your seeds with this paste and dry in shade before planting."
-                else:
-                    response = "बीजामृत का उपयोग बीज उपचार के लिए किया जाता है। बनाने की विधि: 5 किलो गाय का गोबर, 5 लीटर गोमूत्र, 50 ग्राम चूना और मुट्ठी भर जंगल की मिट्टी को 20 liters पानी में मिलाएं। 24 घंटे रखें। बुवाई से पहले बीजों पर इसका लेप लगाएं।"
-            
-            # C. Crop Recommendation Navigation
-            elif "crop" in query_lower or "grow" in query_lower or "plant" in query_lower or "फसल" in query_lower or "बोना" in query_lower:
-                if not is_hindi:
-                    response = "To get crop recommendations, please navigate to the Crop & Seed Guidance tab on the sidebar. You can input your Nitrogen, Phosphorus, Potassium, and water levels to predict the most suited crop and seeds."
-                else:
-                    response = "फसल की सिफारिश पाने के लिए, कृपया साइडबार पर फसल और बीज मार्गदर्शन टैब पर जाएं। वहां आप नाइट्रोजन, फास्फोरस, पोटाश की मात्रा डालकर सही फसल जान सकते हैं।"
-                    
-            # D. Disease / Organic Treatment matching
+        st.markdown(f"""<div class="glass-card" style="border-left: 5px solid #74c69d; margin-top:20px;">
+<h4 style="color:#74c69d; margin-top:0;">{ 'Voice Consultant Response' if not is_hindi else 'आवाज सलाहकार की प्रतिक्रिया' }</h4>
+<p style="font-size:1.15rem; line-height:1.6; color:#e8f5e9; white-space: pre-wrap;">{response}</p>
+</div>""", unsafe_allow_html=True)
+
+        # TTS playback
+        try:
+            speech_text = response
+            if "Organic Advice:" in response:
+                speech_text = response.split("Organic Advice:", 1)[1].strip()
+            from gtts import gTTS
+            import io
+            has_hindi = any(ord(char) >= 0x0900 and ord(char) <= 0x097F for char in speech_text)
+            tts_lang = 'hi' if (has_hindi or is_hindi) else 'en'
+            tts = gTTS(text=speech_text, lang=tts_lang, slow=False)
+            fp = io.BytesIO()
+            tts.write_to_fp(fp)
+            fp.seek(0)
+            st.audio(fp, format="audio/mp3", autoplay=True)
+        except Exception as e:
+            st.warning(f"Voice generation failed: {str(e)}")
+
+    # Divider and Ask the Organic Expert detailed text Q&A
+    st.markdown("---")
+    st.markdown(f"### 🔍 { 'Ask the Organic Expert' if not is_hindi else 'जैविक विशेषज्ञ से पूछें' }")
+    st.write("Got a complex question about natural farming formulations, pest control, or crop layouts? Ask for a detailed, step-by-step organic guide!")
+    
+    academy_query = st.text_input("Enter your question / अपना प्रश्न दर्ज करें", placeholder="e.g., How to prepare Agni Astra and when to spray it?", key="voice_academy_query_input")
+    if st.button("Ask Expert" if not is_hindi else "विशेषज्ञ से पूछें", key="voice_academy_query_btn"):
+        if academy_query:
+            api_key = get_api_key()
+            if api_key:
+                with st.spinner("Expert is drafting a detailed guide... / विशेषज्ञ उत्तर तैयार कर रहे हैं..."):
+                    system_instruction = """You are an expert advisor in Zero Budget Natural Farming (ZBNF) and organic farming.
+Provide deep, highly actionable, step-by-step instructions. Focus purely on natural and organic methods, including companion planting, multi-canopy layers, and traditional Indian formulations. Do not recommend any chemicals."""
+                    response = call_gemini(academy_query, system_instruction=system_instruction)
+                    st.session_state.voice_academy_response = response
             else:
-                matched_pest = None
-                for key in organic_treatments.keys():
-                    if key in query_lower:
-                        matched_pest = key
-                        break
-                
-                if matched_pest:
-                    remedy_info = organic_treatments[matched_pest]
+                # Rule-based offline matching
+                query_lower = academy_query.lower()
+                response = ""
+                if "jeevamrutha" in query_lower or "जीवामृत" in query_lower:
                     if not is_hindi:
-                        response = f"For {matched_pest.capitalize()}: use {remedy_info['remedy']}. Preparation: {remedy_info['prep']}. Preventative: {remedy_info['prevention']}."
+                        response = "Jeevamrutha is an organic microbial culture. To prepare it: mix 10 kg cow dung, 10 liters cow urine, 2 kg jaggery, 2 kg pulse flour, and a handful of forest soil in 200 liters of water. Ferment for 7 days in shade, stirring twice daily. Apply to the soil near the root zone."
                     else:
-                        response = f"{matched_pest.capitalize()} के लिए: {remedy_info['remedy']} का प्रयोग करें। बनाने की विधि: {remedy_info['prep']}"
+                        response = "जीवामृत एक जैविक खाद है। इसे बनाने के लिए: 10 किलो गाय का गोबर, 10 लीटर गोमूत्र, 2 किलो गुड़, 2 किलो बेसन और मुट्ठी भर जंगल की मिट्टी को 200 लीटर पानी में मिलाएं। छांव में 7 दिनों तक किण्वित होने दें। इसे मिट्टी में छिड़कें।"
+                elif "beejamrutha" in query_lower or "बीजामृत" in query_lower:
+                    if not is_hindi:
+                        response = "Beejamrutha is used for seed treatment. Preparation: mix 5 kg cow dung, 5 liters cow urine, 50 grams lime, and a handful of forest soil in 20 liters of water. Let it ferment for 24 hours. Coat your seeds with this paste and dry in shade before planting."
+                    else:
+                        response = "बीजामृत का उपयोग बीज उपचार के लिए किया जाता है। बनाने की विधि: 5 किलो गाय का गोबर, 5 लीटर गोमूत्र, 50 ग्राम चूना और मुट्ठी भर जंगल की मिट्टी को 20 liters पानी में मिलाएं। 24 घंटे रखें। बुवाई से पहले बीजों पर इसका लेप लगाएं।"
+                elif "crop" in query_lower or "grow" in query_lower or "plant" in query_lower or "फसल" in query_lower or "बोना" in query_lower:
+                    if not is_hindi:
+                        response = "To get crop recommendations, please navigate to the Crop & Seed Guidance tab on the sidebar. You can input your Nitrogen, Phosphorus, Potassium, and water levels to predict the most suited crop and seeds."
+                    else:
+                        response = "फसल की सिफारिश पाने के लिए, कृपया साइडबार पर फसल और बीज मार्गदर्शन टैब पर जाएं। वहां आप नाइट्रोजन, फास्फोरस, पोटाश की मात्रा डालकर सही फसल जान सकते हैं।"
                 else:
-                    # Default general fallback
-                    if not is_hindi:
-                        response = "I am your natural farming consultant. You can ask me how to prepare 'Jeevamrutha', 'Beejamrutha', or ask about specific pest remedies like 'Whitefly', 'Aphids', or 'Powdery Mildew'."
+                    matched_pest = None
+                    for key in organic_treatments.keys():
+                        if key in query_lower:
+                            matched_pest = key
+                            break
+                    if matched_pest:
+                        remedy_info = organic_treatments[matched_pest]
+                        if not is_hindi:
+                            response = f"For {matched_pest.capitalize()}: use {remedy_info['remedy']}. Preparation: {remedy_info['prep']}. Preventative: {remedy_info['prevention']}."
+                        else:
+                            response = f"{matched_pest.capitalize()} के लिए: {remedy_info['remedy']} का प्रयोग करें। बनाने की विधि: {remedy_info['prep']}"
                     else:
-                        response = "मैं आपका प्राकृतिक खेती सलाहकार हूँ। आप मुझसे 'जीवामृत', 'बीजामृत' की विधि पूछ सकते हैं, या 'सफेद मक्खी', 'चेपा' जैसी बीमारियों के जैविक उपाय जान सकते हैं।"
-        
-        # Display response
-        st.markdown(textwrap.dedent(f"""
-            <div class="glass-card" style="border-left: 5px solid #74c69d;">
-                <h4 style="color:#74c69d; margin-top:0;">{ 'Consultant Response' if not is_hindi else 'सलाहकार की प्रतिक्रिया' }</h4>
-                <p style="font-size:1.15rem; line-height:1.6; color:#e8f5e9;">{response}</p>
-            </div>
-        """), unsafe_allow_html=True)
-        
-        # Text-To-Speech browser synthesis trigger
-        st.markdown(f"""
-            <script>
-            if ('speechSynthesis' in window) {{
-                window.speechSynthesis.cancel(); // Stop any ongoing speech
-                const utter = new SpeechSynthesisUtterance("{response.replace('"', '\\"')}");
-                utter.lang = "{ 'en-IN' if not is_hindi else 'hi-IN' }";
-                utter.pitch = 1.0;
-                utter.rate = 0.95;
-                window.speechSynthesis.speak(utter);
-            }}
-            </script>
-        """, unsafe_allow_html=True)
+                        if not is_hindi:
+                            response = "I am your natural farming consultant. You can ask me how to prepare 'Jeevamrutha', 'Beejamrutha', or ask about specific pest remedies like 'Whitefly', 'Aphids', or 'Powdery Mildew'."
+                        else:
+                            response = "मैं आपका प्राकृतिक खेती सलाहकार हूँ। आप मुझसे 'जीवामृत', 'बीजामृत' की विधि पूछ सकते हैं, या 'सफेद मक्खी', 'चेपा' जैसी बीमारियों के जैविक उपाय जान सकते हैं।"
+                st.session_state.voice_academy_response = response
+                
+    if "voice_academy_response" in st.session_state:
+        st.markdown(f"""<div class="glass-card" style="border-left: 5px solid #74c69d; margin-top:15px;">
+<h4 style="color:#74c69d; margin-top:0;">{ 'Expert Response' if not is_hindi else 'विशेषज्ञ की प्रतिक्रिया' }</h4>
+<p style="font-size:1.05rem; line-height:1.6; color:#e8f5e9; white-space: pre-wrap;">{st.session_state.voice_academy_response}</p>
+</div>""", unsafe_allow_html=True)
 
 # ----------------------------------------------------
 # 2. Crop & Seed Guidance Module
@@ -995,22 +1023,3 @@ elif menu in ["📚 Natural Farming Academy", "📚 प्राकृतिक 
                         <p style="font-size:0.95rem; line-height:1.4;">{desc}</p>
                     </div>
                 """, unsafe_allow_html=True)
-                
-    st.markdown("---")
-    st.markdown(f"### 🔍 { 'Ask the Organic Expert' if not is_hindi else 'जैविक विशेषज्ञ से पूछें' }")
-    st.write("Got a question about preparing formulations, plant spacing, or multi-layer farming? Ask our AI expert!")
-    
-    academy_query = st.text_input("Enter your question / अपना प्रश्न दर्ज करें", placeholder="e.g., How to control pests in Layer 5 crops organically?", key="academy_query_input")
-    if st.button("Ask Expert" if not is_hindi else "विशेषज्ञ से पूछें", key="academy_query_btn"):
-        if academy_query:
-            with st.spinner("Expert is drafting a response... / विशेषज्ञ उत्तर तैयार कर रहे हैं..."):
-                system_instruction = """You are an expert advisor in Zero Budget Natural Farming (ZBNF) and organic farming.
-Provide deep, highly actionable, step-by-step instructions. Focus purely on natural and organic methods, including companion planting, multi-canopy layers, and traditional Indian formulations. Do not recommend any chemicals."""
-                response = call_gemini(academy_query, system_instruction=system_instruction)
-                st.session_state.academy_response = response
-                
-    if "academy_response" in st.session_state:
-        st.markdown(f"""<div class="glass-card" style="border-left: 5px solid #74c69d; margin-top:15px;">
-<h4 style="color:#74c69d; margin-top:0;">{ 'Expert Response' if not is_hindi else 'विशेषज्ञ की प्रतिक्रिया' }</h4>
-<p style="font-size:1.05rem; line-height:1.6; color:#e8f5e9; white-space: pre-wrap;">{st.session_state.academy_response}</p>
-</div>""", unsafe_allow_html=True)
