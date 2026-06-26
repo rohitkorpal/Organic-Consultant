@@ -1,3 +1,6 @@
+<img width="1457" height="636" alt="image" src="https://github.com/user-attachments/assets/b43366b0-8b67-4403-94b6-399d9b4a607b" />
+
+
 # 🌾 AgroSolution - Natural Farming Consultant
 
 A premium, interactive, AI-powered Streamlit web application designed as a voice-first mobile/desktop consultant for farmers transitioning to Zero Budget Natural Farming (ZBNF) and organic cultivation. 
