@@ -9,7 +9,7 @@ import textwrap
 
 # Set page configuration
 st.set_page_config(
-    page_title="AgroSolution | Natural Farming Consultant",
+    page_title="Krishi Mitraa AI | Natural Farming Consultant",
     page_icon="🌾",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -470,7 +470,7 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # Sidebar UI
-st.sidebar.markdown("<div class='sidebar-title'>🌾 AgroSolution</div>", unsafe_allow_html=True)
+st.sidebar.markdown("<div class='sidebar-title'>🌾 Krishi Mitraa AI </div>", unsafe_allow_html=True)
 st.sidebar.markdown("<div style='text-align:center; color:#b7e4c7; font-size:0.85rem; margin-top:-15px; margin-bottom:25px;'>Natural Farming Consultant</div>", unsafe_allow_html=True)
 
 # Regional Language configuration
