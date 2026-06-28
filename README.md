@@ -118,5 +118,5 @@ Krishi Mitraa AI-main/
 
 4. **Launch the Application**:
    ```bash
-   streamlit run "UI - Copy/organic_consultant.py" --server.port 8505
+   streamlit run "organic_consultant.py" --server.port 8505
    ```
