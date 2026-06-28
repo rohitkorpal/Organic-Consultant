@@ -1,3 +1,4 @@
+<img width="1461" height="708" alt="image" src="https://github.com/user-attachments/assets/731b7626-3578-4be5-9c87-a26509fc99b9" />
 
 
 # 🌾 Krishi Mitraa AI - Natural Farming Consultant
